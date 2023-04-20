@@ -19,6 +19,7 @@ services:
       - APP_ENV=dev
       - SECRET_KEY=secret
       - DEBUG=True
+      - OPENAI_API_KEY=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
       - DATABASE_URL=postgresql://postgres:@postgres-python:5432/anythink-market
       - GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
     depends_on:

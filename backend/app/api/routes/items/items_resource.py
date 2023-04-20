@@ -24,6 +24,8 @@ from app.models.schemas.items import (
 from app.resources import strings
 from app.services.items import check_item_exists, get_slug_for_item
 from app.services.event import send_event
+from app.core.settings.app import AppSettings
+import openai
 
 router = APIRouter()
 
@@ -61,6 +63,7 @@ async def create_new_item(
     item_create: ItemInCreate = Body(..., embed=True, alias="item"),
     user: User = Depends(get_current_user_authorizer()),
     items_repo: ItemsRepository = Depends(get_repository(ItemsRepository)),
+    settings: AppSettings
 ) -> ItemInResponse:
     slug = get_slug_for_item(item_create.title)
     if await check_item_exists(items_repo, slug):
@@ -68,6 +71,15 @@ async def create_new_item(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=strings.ITEM_ALREADY_EXISTS,
         )
+    if not item_create.image
+        openai_api_key = settings.openai_api_key
+        openai.api_key = openai_api_key
+        response = openai.Image.create(
+        prompt=item_create.title,
+        n=1,
+        size="256x256"
+        )
+        item_create.image = response['data'][0]['url']
     item = await items_repo.create_item(
         slug=slug,
         title=item_create.title,
